@@ -1,121 +1,104 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Gate; 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use App\Models\Subject;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        if (!Gate::allows('edit-student')) {
+        if (!Gate::allows('view-student')) {
             abort(403, 'Sorry, you’re not allowed here!');
         }
-        //$students = Student::all(); // Retrieve all students from the database
-        $students = Student::paginate(6); // Retrieve all students from the database with pagination
-        return view('students.index', compact('students')); // Pass the students data to the view
 
-    
+        $students = Student::with('subjects')->paginate(6);
+        return view('students.index', compact('students'));
     }
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        return view('students.create');
+        if (!Gate::allows('edit-student')) {
+            abort(403, 'Sorry, you’re not allowed to create student records.');
+        }
+
+        $subjects = Subject::all();
+
+        // Pass to the view
+        return view('students.create', compact('subjects'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // Validate input data
+        if (!Gate::allows('edit-student')) {
+            abort(403, 'Sorry, you’re not allowed to store student records.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:students,email',
         ]);
 
-        // Create and save student
-        Student::create([
+        $student = Student::create([
             'name' => $request->name,
             'email' => $request->email,
             'studentId' => $request->studentId,
         ]);
-
-        // Redirect with success message
-        return redirect()->route('students.index')->with('success', 'Student added successfully!');
+        
+        // Attach selected subjects (if any)
+        if ($request->has('subject_ids')) {
+            $student->subjects()->attach($request->subject_ids);
+        }
+        
+        return redirect()->route('student.index')->with('success', 'Student added successfully!');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Student $student)
     {
+        if (!Gate::allows('view-student')) {
+            abort(403, 'Sorry, you’re not allowed to view this student.');
+        }
+
         return view('students.show', compact('student'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Student $student)
     {
+        if (!Gate::allows('edit-student')) {
+            abort(403, 'Sorry, you’re not allowed to edit student records.');
+        }
+
         return view('students.edit', compact('student'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Student $student)
     {
-/*         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email,' . $student->id,
-        ]);
-        // Update student details
+        if (!Gate::allows('edit-student')) {
+            abort(403, 'Sorry, you’re not allowed to update student records.');
+        }
+
         $student->update([
             'name' => $request->name,
             'email' => $request->email,
             'studentId' => $request->studentId,
+            'updated_at' => now(),
         ]);
-        // Redirect with success message
-        return redirect()->route('students.index')
-            ->withSuccess('Student record updated successfully.'); */
 
-            if(!Gate::allows('edit-student')) {
-                abort(403, 'Sorry, you’re not allowed here!');
-            }
-
-            $student->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'studentId' => $request->studentId,
-                'updated_at' => now(),
-            ]);
-
-            return redirect()->route('students.index')
-                ->withSuccess('Student record updated successfully.');
-        
+        return redirect()->route('student.index')
+            ->with('success', 'Student record updated successfully.');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Student $student)
     {
-
-        if(!Gate::allows('delete-student')) {
-            abort(403, 'Sorry, you’re not allowed here!');
+        if (!Gate::allows('delete-student')) {
+            abort(403, 'Sorry, you’re not allowed to delete student records.');
         }
+
         $student->delete();
-        return redirect()->route('students.index')
-            ->withSuccess('Student record deleted successfully.');   
-             
+        return redirect()->route('student.index')
+            ->with('success', 'Student record deleted successfully.');
     }
 }

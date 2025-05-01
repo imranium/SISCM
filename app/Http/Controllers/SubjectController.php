@@ -32,19 +32,19 @@ class SubjectController extends Controller
         // Validation
         $request->validate([
             'subjectCode' => 'required|string|max:255|unique:subjects',
-            'name' => 'required|string|max:255',
+            'subjectName' => 'required|string|max:255',
             'credit_hours' => 'required|integer|min:1',
             //'lecturer_id' => 'nullable|exists:lecturers,id', // Assuming you have a lecturers table
         ]);
 
         Subject::create([
             'subjectCode' => $request->subjectCode,
-            'name' => $request->name,
+            'subjectName' => $request->subjectName,
             'credit_hours' => $request->credit_hours,
             //'lecturer_id' => $request->lecturer_id,
         ]);
 
-        return redirect()->route('subjects.index')->with('success', 'Subject created successfully.');
+        return redirect()->route('subject.index')->with('success', 'Subject created successfully.');
     }
 
     /**
@@ -73,20 +73,20 @@ class SubjectController extends Controller
         // Validation
         $request->validate([
             'subjectCode' => 'required|string|max:255|unique:subjects,subjectCode,' . $subject->id,
-            'name' => 'required|string|max:255',
+            'subjectName' => 'required|string|max:255',
             'credit_hours' => 'required|integer|min:1',
             //'lecturer_id' => 'nullable|exists:lecturers,id',
         ]);
 
         $subject->update([
             'subjectCode' => $request->subjectCode,
-            'name' => $request->name,
+            'subjectName' => $request->subjectName,
             'credit_hours' => $request->credit_hours,
             //'lecturer_id' => $request->lecturer_id,
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('subjects.index')
+        return redirect()->route('subject.index')
             ->with('success', 'Subject record updated successfully.');
     }
 
@@ -96,7 +96,7 @@ class SubjectController extends Controller
     public function destroy(Subject $subject)
     {
         $subject->delete();
-        return redirect()->route('subjects.index')
+        return redirect()->route('subject.index')
             ->with('success', 'Subject record deleted successfully.');
     }
 }

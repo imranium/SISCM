@@ -27,14 +27,14 @@
                 <tr>
                     <td>{{ $subject->id }}</td>
                     <td>{{ $subject->subjectCode }}</td>
-                    <td>{{ $subject->name }}</td>
+                    <td>{{ $subject->subjectName }}</td>
                     <td>{{ $subject->credit_hours }}</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('subjects.edit', $subject->id) }}" class="btn btn-sm btn-warning text-white">
+                            <a href="{{ route('subject.edit', $subject->id) }}" class="btn btn-sm btn-warning text-white">
                                 Edit
                             </a>
-                            <form action="{{ route('subjects.destroy', $subject->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this Subject?')">
+                            <form action="{{ route('subject.destroy', $subject->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this Subject?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">

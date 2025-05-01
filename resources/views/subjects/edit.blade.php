@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{route('subjects.update', $subject->id)}}" method="POST" class="bg-white p-6 rounded shadow-md">
+    <form action="{{route('subject.update', $subject->id)}}" method="POST" class="bg-white p-6 rounded shadow-md">
         @csrf
         @method('PUT') {{-- methof for updating resources --}}
 
@@ -26,7 +26,7 @@
 
         <div class="mb-3">
             <label class="form-label">Name</label>
-            <input type="email" name="name" class="form-control" value="{{ old('name', $Subject->name) }}" required>
+            <input type="text" name="subjectName" class="form-control" value="{{ old('subjectName', $Subject->subjectName) }}" required>
         </div>
 
         <div class="mb-3">
@@ -35,6 +35,6 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Update Subject</button>
-        <a href="{{ route('subjects.index') }}" class="btn btn-secondary ms-2">Cancel</a>
+        <a href="{{ route('subject.index') }}" class="btn btn-secondary ms-2">Cancel</a>
     </form>
 @endsection

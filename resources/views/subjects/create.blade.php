@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('subjects.store') }}" method="POST" class="bg-light p-4 rounded shadow-sm">
+    <form action="{{ route('subject.store') }}" method="POST" class="bg-light p-4 rounded shadow-sm">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Subject Code</label>
@@ -23,8 +23,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label">Name</label>
-            <input type="email" class="form-control" id="name" name="name" required>
+            <label for="subjectName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="subjectName" name="subjectName" required>
         </div>
 
         <div class="mb-3">

@@ -12,12 +12,9 @@ class LecturerController extends Controller
      */
     public function index()
     {
-        if (Gate::allows('access-lecturer-index')) {
-            $data = Lecturer::paginate(5);
-            return view('lecturers.index', compact('lecturers'));
-        } else {
-            abort(403, 'Sorry, you’re not allowed here!');
-        } 
+        $lecturers = Lecturer::paginate(5);
+        return view('lecturers.index', compact('lecturers'));
+
     }
 
     /**
@@ -36,15 +33,16 @@ class LecturerController extends Controller
         // validation
         $request->validate([
             'name' => 'required|string|max:255',
-            'staffId' => 'required|string|max:255|unique',
+            'staffId' => 'required|string|max:255|unique:lecturers,staffId',
         ]);
+        
 
         Lecturer::create([
             'name'=> $request->name,
             'staffId' => $request->staffId,
         ]);
 
-        return redirect()->route('lecturers.index')->with('success', 'Lecturer created successfully.');
+        return redirect()->route('lecturer.index')->with('success', 'Lecturer created successfully.');
 
     }
 
@@ -70,9 +68,10 @@ class LecturerController extends Controller
     public function update(Request $request, Lecturer $lecturer)
     {
         $request->validate([
-            'name'=> 'required|string|max:255',
-            'staffId'=> 'required|string|max:255|unique',
+            'name' => 'required|string|max:255',
+            'staffId' => 'required|string|max:255|unique:lecturers,staffId',
         ]);
+        
 
         $lecturer->update([
             'name' => $request->name,
@@ -80,7 +79,7 @@ class LecturerController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('lecturers.index')
+        return redirect()->route('lecturer.index')
         ->withSuccess('Lecturer record updated successfully.');
     }
 
@@ -90,7 +89,7 @@ class LecturerController extends Controller
     public function destroy(Lecturer $lecturer)
     {
         $lecturer->delete();
-        return redirect()->route('lecturers.index')
+        return redirect()->route('lecturer.index')
             ->withSuccess('Lecturers record deleted successfully.');  
     }
 }

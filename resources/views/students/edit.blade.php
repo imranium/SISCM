@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{route('students.update', $student->id)}}" method="POST" class="bg-white p-6 rounded shadow-md">
+    <form action="{{route('student.update', $student->id)}}" method="POST" class="bg-white p-6 rounded shadow-md">
         @csrf
         @method('PUT') {{-- methof for updating resources --}}
 
@@ -35,6 +35,6 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Update Student</button>
-        <a href="{{ route('students.index') }}" class="btn btn-secondary ms-2">Cancel</a>
+        <a href="{{ route('student.index') }}" class="btn btn-secondary ms-2">Cancel</a>
     </form>
 @endsection

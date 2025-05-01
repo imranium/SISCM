@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('lecturers.store') }}" method="POST" class="bg-light p-4 rounded shadow-sm">
+    <form action="{{ route('lecturer.store') }}" method="POST" class="bg-light p-4 rounded shadow-sm">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>

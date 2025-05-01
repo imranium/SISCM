@@ -13,11 +13,14 @@
     </div>
     @endif
 
+    <!-- Show "Add Student" button only to Admin and Lecturer -->
+    @can('edit-student')
     <div class="mb-3">
-        <a href="{{ route('students.create') }}" class="btn btn-primary">
+        <a href="{{ route('student.create') }}" class="btn btn-primary">
             + Add Student
         </a>
     </div>
+    @endcan
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
@@ -27,6 +30,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Student ID</th>
+                    <th>Subjects</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -38,21 +42,35 @@
                     <td>{{ $student->email }}</td>
                     <td>{{ $student->studentId }}</td>
                     <td>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('students.show', $student->id) }}" class="btn btn-sm btn-info text-white">
-                                View
-                            </a>
-                            <a href="{{ route('students.edit', $student->id) }}" class="btn btn-sm btn-warning text-white">
-                                Edit
-                            </a>
-                            <form action="{{ route('students.destroy', $student->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this student?')">
+                        @if($student->subjects->isNotEmpty())
+                            <ul class="mb-0">
+                                @foreach($student->subjects as $subject)
+                                    <li>{{ $subject->name }} ({{ $subject->subjectCode }})</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <em>No subjects assigned</em>
+                        @endif
+                    </td>
+                    <td>
+                        <!-- View Details: All roles -->
+                        @can('view-student')
+                            <a href="{{ route('student.show', $student->id) }}" class="btn btn-info btn-sm">View</a>
+                        @endcan
+
+                        <!-- Edit: Admin & Lecturer -->
+                        @can('edit-student')
+                            <a href="{{ route('student.edit', $student->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        @endcan
+
+                        <!-- Delete: Admin only -->
+                        @can('delete-student')
+                            <form action="{{ route('student.destroy', $student->id) }}" method="POST" style="display:inline-block">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    Delete
-                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
                             </form>
-                        </div>
+                        @endcan
                     </td>
                 </tr>
                 @endforeach
@@ -63,4 +81,5 @@
     <div class="mt-4">
         {{ $students->links('pagination::bootstrap-5') }} 
     </div>
+</div>
 @endsection

@@ -20,9 +20,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('students.index') }}">Students</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('lecturers.index') }}">Lecturers</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('subjects.index') }}">Subjects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('student.index') }}">Students</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('lecturer.index') }}">Lecturers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('subject.index') }}">Subjects</a></li>
                 </ul>
             </div>
         </div>

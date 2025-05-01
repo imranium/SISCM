@@ -12,14 +12,15 @@ class Subject extends Model
 
     protected $fillable = [
         'subjectCode',
-        'name',
+        'subjectName',
         'credit_hours',
     ];
 
     public function students()
-{
-    return $this->belongsToMany(Student::class, 'student_subject');
-}
+    {
+        return $this->belongsToMany(Student::class, 'student_subject', 'subject_id', 'student_id');
+    }
+    
 
     public function lecturer()
     {
