@@ -26,6 +26,7 @@ class SubjectSeeder extends Seeder
             'Moral Education',
             'Art Education',
             'Physical Education',
+            'Sains Komputer',
         ];
 
         foreach ($subjects as $subject) {
