@@ -26,4 +26,8 @@ class Subject extends Model
     {
         return $this->belongsTo(Lecturer::class); // One-to-many relationship
     }
+
+    public function assessments() {
+        return $this->hasMany(Assessment::class);
+    }
 }
