@@ -11,86 +11,102 @@ class AssessmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($subject_id)
     {
-        $assessments = Assessment::with('subject')->paginate(10);
-        return view('assessments.index', compact('assessments'));
+        $subject = Subject::with('assessments')->findOrFail($subject_id);
+
+        $assessments = $subject->assessments()->paginate(10);
+
+        return view('assessments.index', compact('subject', 'assessments'));
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create($subject_id)
     {
-        $subjects = Subject::all(); // assuming lecturer can see all
-        return view('assessments.create', compact('subjects'));
+        $subject = Subject::findOrFail($subject_id);
+
+        return view('assessments.create', compact('subject'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // Store new assessment
+    public function store(Request $request, $subject_id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:formative,summative',
-            'percentage' => 'required|integer|min:1|max:100',
-            'subject_id' => 'required|exists:subjects,id',
+            'percentage' => 'required|numeric|min:0|max:100',
         ]);
-
-        // Optional: add check for 60%/40% cap logic later
-
-        Assessment::create($request->all());
-
-        return redirect()->route('assessment.index')->with('success', 'Assessment created successfully.');
+    
+        $subject = Subject::findOrFail($subject_id);
+    
+        // Get current total percentage for the same type of assessments
+        $currentTotal = $subject->assessments()
+            ->where('type', $validated['type'])
+            ->sum('percentage');
+    
+        $maxLimit = $validated['type'] === 'formative' ? 60 : 30;
+    
+        if ($currentTotal + $validated['percentage'] > $maxLimit) {
+            return back()->withErrors([
+                'percentage' => "Total {$validated['type']} assessments for this subject cannot exceed {$maxLimit}%."
+            ])->withInput();
+        }
+    
+        $subject->assessments()->create($validated);
+    
+        return redirect()->route('assessment.index', $subject_id)
+                         ->with('success', 'Assessment created successfully.');
     }
+    
+
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
+        $assessment = Assessment::with('subject')->findOrFail($id);
+
         return view('assessments.show', compact('assessment'));
     }
-
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    // Show edit form
+    public function edit($id)
     {
-        $subjects = Subject::all();
-        return view('assessment.edit', compact('assessment', 'subjects'));
+        $assessment = Assessment::findOrFail($id);
 
+        return view('assessments.edit', compact('assessment'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Update assessment
+    public function update(Request $request, $id)
     {
-        $request->validate([
+        $assessment = Assessment::findOrFail($id);
+
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:formative,summative',
-            'percentage' => 'required|integer|min:1|max:100',
-            'subject_id' => 'required|exists:subjects,id',
+            'percentage' => 'required|numeric|min:0|max:100',
         ]);
 
-        // Optional: add check for 60%/40% cap logic later
+        $assessment->update($validated);
 
-        $assessment = Assessment::findOrFail($id);
-        $assessment->update($request->all());
-
-        return redirect()->route('assessment.index')->with('success', 'Assessment updated successfully.');
+        return redirect()->route('assessments.index', $assessment->subject_id)
+                         ->with('success', 'Assessment updated.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Assessment $assessment)
+    // Delete assessment
+    public function destroy($id)
     {
-       
+        $assessment = Assessment::findOrFail($id);
+
+        $subject_id = $assessment->subject_id;
+
         $assessment->delete();
-        return redirect()->route('assessment.index')->with('success', 'Assessment deleted.');
-    
+
+        return redirect()->route('assessments.index', $subject_id)
+                         ->with('success', 'Assessment deleted.');
     }
 }

@@ -23,6 +23,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('view-student', function ($user) {
             return in_array($user->user_role, [1, 2, 3]); // All can view details
         });
+
+        Gate::define('view-own-subjects', function ($user) {
+            return $user->user_role === 3; // Only students
+        });
+
+        Gate::define('create-student', function ($user) {
+            return in_array($user->user_role, [1, 2]); // Admin and Lecturer
+        });
     
         Gate::define('edit-student', function ($user) {
             return in_array($user->user_role, [1, 2]); // Admin and Lecturer

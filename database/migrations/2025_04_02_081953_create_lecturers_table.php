@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('staffId');
             $table->string('name');
+            $table->unsignedBigInteger('user_id')->nullable()->unique(); // One-to-one
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

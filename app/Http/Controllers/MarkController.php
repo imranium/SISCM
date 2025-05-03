@@ -10,52 +10,65 @@ use Illuminate\Http\Request;
 
 class MarkController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Show all marks for a specific assessment
+    public function index($assessment_id)
     {
-        // Fetch all marks from the database
-        $marks = Mark::with(['student', 'assessment'])->paginate(6); // Assuming you have a Mark model
-        
-        // Return the view with marks data
-        return view('marks.index', compact('marks'));
+        $assessment = Assessment::with('subject')->findOrFail($assessment_id);
+
+        $students = $assessment->subject->students ?? collect();
+    
+        // Fetch marks where assessment_id matches
+        $existingMarks = Mark::where('assessment_id', $assessment_id)
+                            ->get()
+                            ->keyBy('student_id'); // So we can do $existingMarks[$student->id]
+    
+        return view('marks.index', compact('assessment', 'students', 'existingMarks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // Fetch all students and assessments for the form
-        $students = Student::all(); // Assuming you have a Student model
-        $assessments = Assessment::all(); // Assuming you have an Assessment model
 
-        // Return the view with students and assessments data
-        return view('marks.create', compact('students', 'assessments'));
-    }
+    // Show form to add mark for a student
+
+    public function create($assessment_id)
+{
+    $assessment = Assessment::findOrFail($assessment_id);
+    $subject = $assessment->subject;
+
+    // Only students registered to this subject
+    $students = $subject->students;
+
+    return view('marks.create', compact('assessment', 'students'));
+}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $assessment_id)
     {
-        // Validation
+        $assessment = Assessment::findOrFail($assessment_id);
+    
         $request->validate([
             'student_id' => 'required|exists:students,id',
-            'assessment_id' => 'required|exists:assessments,id',
-            'mark' => 'required|numeric|min:0|max:100', // Assuming marks are out of 100
+            'mark' => 'required|numeric|min:0|max:' . $assessment->percentage, 
         ]);
-
-        // Create a new mark record
+    
+        // Prevent duplicate mark entry
+        $existing = Mark::where('assessment_id', $assessment_id)
+                        ->where('student_id', $request->student_id)
+                        ->first();
+    
+        if ($existing) {
+            return redirect()->back()->withErrors(['Mark already exists for this student and assessment.']);
+        }
+    
         Mark::create([
             'student_id' => $request->student_id,
-            'assessment_id' => $request->assessment_id,
+            'assessment_id' => $assessment_id,
             'mark' => $request->mark,
         ]);
-
-        return redirect()->route('mark.index')->with('success', 'Mark created successfully.');
+    
+        return redirect()->route('mark.index', $assessment_id)->with('success', 'Mark added successfully.');
     }
+    
 
     /**
      * Display the specified resource.
@@ -68,43 +81,54 @@ class MarkController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($assessment_id, $student_id)
     {
-        $students = Student::all(); 
-        $assessments = Assessment::all(); // Assuming you have an Assessment model
-
-        return view('marks.edit', compact('mark', 'students', 'assessments'));
+        $assessment = Assessment::findOrFail($assessment_id);
+        $student = Student::findOrFail($student_id);
+    
+        $mark = Mark::where('assessment_id', $assessment_id)
+                    ->where('student_id', $student_id)
+                    ->firstOrFail();
+    
+        return view('marks.edit', compact('assessment', 'student', 'mark'));
     }
+    
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $assessment_id, $student_id)
     {
-        // Validation
+        $assessment = Assessment::findOrFail($assessment_id);
+    
         $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'assessment_id' => 'required|exists:assessments,id',
-            'mark' => 'required|numeric|min:0|max:100', // Assuming marks are out of 100
+            'mark' => 'required|numeric|min:0|max:' . $assessment->percentage,
         ]);
-
-        // Update the mark record
-        $mark = Mark::findOrFail($id);
+    
+        $mark = Mark::where('assessment_id', $assessment_id)
+                    ->where('student_id', $student_id)
+                    ->firstOrFail();
+    
         $mark->update([
-            $request->all()
+            'mark' => $request->mark,
         ]);
-
-        return redirect()->route('mark.index')->with('success', 'Mark updated successfully.');
+    
+        return redirect()->route('mark.index', $assessment_id)->with('success', 'Mark updated successfully.');
     }
+    
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Mark $mark)
+    public function destroy($assessment_id, $student_id)
     {
-
+        $mark = Mark::where('assessment_id', $assessment_id)
+                    ->where('student_id', $student_id)
+                    ->firstOrFail();
+    
         $mark->delete();
-
-        return redirect()->route('mark.index')->with('success', 'Mark deleted successfully.');
+    
+        return redirect()->route('mark.index', $assessment_id)->with('success', 'Mark deleted successfully.');
     }
+    
 }

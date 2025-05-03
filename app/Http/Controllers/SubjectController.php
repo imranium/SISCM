@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Subject;
 use Illuminate\Http\Request;
@@ -12,9 +13,18 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        $subjects = Subject::paginate(6); // Retrieve all subjects from the database with pagination
-        return view('subjects.index', compact('subjects')); // Pass the subjects data to the view
+        //dd(Auth::user(), Auth::user()?->lecturer);
+        
+        $lecturer = Auth::user()->lecturer;
+    
+        if (!$lecturer) {
+            abort(403, 'Unauthorized: Only lecturers can view their subjects.');
+        }
+    
+        $subjects = $lecturer->subjects()->paginate(6);
+        return view('subjects.index', compact('subjects'));
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -29,23 +39,34 @@ class SubjectController extends Controller
      */
     public function store(Request $request)
     {
+        $lecturer = Auth::user()->lecturer;
+        
+        // Debugging: Check if the lecturer is found and the ID is correct
+        //dd($lecturer->id); // Check the lecturer's ID
+    
         // Validation
         $request->validate([
             'subjectCode' => 'required|string|max:255|unique:subjects',
             'subjectName' => 'required|string|max:255',
             'credit_hours' => 'required|integer|min:1',
-            //'lecturer_id' => 'nullable|exists:lecturers,id', // Assuming you have a lecturers table
         ]);
-
+    
+        if (!$lecturer) {
+            abort(403, 'Only lecturers can create subjects.');
+        }
+    
+        
         Subject::create([
             'subjectCode' => $request->subjectCode,
             'subjectName' => $request->subjectName,
             'credit_hours' => $request->credit_hours,
-            //'lecturer_id' => $request->lecturer_id,
+            'lecturer_id' => $lecturer->id, // assign lecturer
         ]);
-
+    
         return redirect()->route('subject.index')->with('success', 'Subject created successfully.');
     }
+    
+    
 
     /**
      * Display the specified resource.

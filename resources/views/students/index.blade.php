@@ -14,7 +14,7 @@
     @endif
 
     <!-- Show "Add Student" button only to Admin and Lecturer -->
-    @can('edit-student')
+    @can('create-student')
     <div class="mb-3">
         <a href="{{ route('student.create') }}" class="btn btn-primary">
             + Add Student

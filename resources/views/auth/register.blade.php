@@ -61,6 +61,34 @@
                             </div>
                         </div>
 
+                        
+
+                        <div class="form-group col-md-6">
+                            <label for="user_role">Register As</label>
+                            <select name="user_role" id="user_role" class="form-control" required>
+                                <option value="3">Student</option>
+                                <option value="2">Lecturer</option>
+                            </select>
+                        </div>
+                        
+                        <div id="studentFields" style="display:none;">
+                            <label for="student_id">Student ID</label>
+                            <input type="text" name="student_id" class="form-control">
+                        </div>
+                        
+                        <div id="lecturerFields" style="display:none;">
+                            <label for="staff_id">Staff ID</label>
+                            <input type="text" name="staff_id" class="form-control">
+                        </div>
+                        
+                        <script>
+                        document.getElementById('user_role').addEventListener('change', function () {
+                            document.getElementById('studentFields').style.display = this.value == 3 ? 'block' : 'none';
+                            document.getElementById('lecturerFields').style.display = this.value == 2 ? 'block' : 'none';
+                        });
+                        </script>
+                        
+
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">

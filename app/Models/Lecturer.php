@@ -19,4 +19,9 @@ class Lecturer extends Model
     {
         return $this->hasMany(Subject::class); // One-to-many relationship
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

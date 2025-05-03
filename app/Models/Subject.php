@@ -14,7 +14,9 @@ class Subject extends Model
         'subjectCode',
         'subjectName',
         'credit_hours',
+        'lecturer_id', // ← Add this line if it's missing
     ];
+    
 
     public function students()
     {

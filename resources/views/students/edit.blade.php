@@ -34,6 +34,17 @@
             <input type="text" name="studentId" class="form-control" value="{{ old('studentId', $student->studentId) }}" required>
         </div>
 
+        <div class="mb-3">
+            <label for="subject_ids[" class="form-label">Subjects</label>
+            <select name="subject_ids[]" class="form-select form-select-sm" aria-label=".form-select-sm example" multiple >
+                @foreach($subjects as $subject)
+                    <option value="{{ $subject->id }}">
+                        {{ $subject->name }} ({{ $subject->subjectCode }})
+                    </option>
+                @endforeach
+            </select>
+        </div> 
+
         <button type="submit" class="btn btn-primary">Update Student</button>
         <a href="{{ route('student.index') }}" class="btn btn-secondary ms-2">Cancel</a>
     </form>

@@ -39,6 +39,7 @@
                     <td>{{ $subject->credit_hours }}</td>
                     <td>
                         <div class="d-flex gap-2">
+                            <a href="{{ route('assessment.index', $subject->id) }}" class="btn btn-sm btn-info text-white">View Assessments</a>
                             <a href="{{ route('subject.show', $subject->id) }}" class="btn btn-sm btn-info text-white">
                                 View
                             </a>

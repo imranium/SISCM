@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('studentId')->unique();
+            $table->unsignedBigInteger('user_id')->nullable()->unique(); // One-to-one
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        
             $table->softDeletes();
             $table->timestamps();
         });

@@ -21,7 +21,7 @@ class StudentController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('edit-student')) {
+        if (!Gate::allows('create-student')) {
             abort(403, 'Sorry, you’re not allowed to create student records.');
         }
 
@@ -71,7 +71,9 @@ class StudentController extends Controller
             abort(403, 'Sorry, you’re not allowed to edit student records.');
         }
 
-        return view('students.edit', compact('student'));
+        $subjects = Subject::all();
+
+        return view('students.edit', compact('student', 'subjects'));
     }
 
     public function update(Request $request, Student $student)
@@ -86,6 +88,10 @@ class StudentController extends Controller
             'studentId' => $request->studentId,
             'updated_at' => now(),
         ]);
+
+        if ($request->has('subject_ids')) {
+            $student->subjects()->attach($request->subject_ids);
+        }
 
         return redirect()->route('student.index')
             ->with('success', 'Student record updated successfully.');

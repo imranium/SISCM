@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('subjectCode')->unique();
             $table->string('subjectName');
             $table->integer('credit_hours');
+            $table->unsignedBigInteger('lecturer_id'); // unsigned integer for foreign key
+            $table->foreign('lecturer_id')->references('id')->on('lecturers')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

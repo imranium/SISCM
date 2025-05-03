@@ -20,13 +20,42 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('student.index') }}">Students</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('lecturer.index') }}">Lecturers</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('subject.index') }}">Subjects</a></li>
+    
+                    @auth
+                        {{-- Admin --}}
+                        @if(auth()->user()->user_role <= 2)
+                            <li class="nav-item"><a class="nav-link" href="{{ route('student.index') }}">Students</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('lecturer.index') }}">Lecturers</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('subject.index') }}">Subjects</a></li>
+    
+                        {{-- Lecturer --}}
+                        @elseif(auth()->user()->user_role === 2)
+                            <li class="nav-item"><a class="nav-link" href="{{ route('subject.index') }}">My Subjects</a></li>
+                            {{-- Add more links specific to lecturers if needed --}}
+    
+                        {{-- Student --}}
+                        @elseif(auth()->user()->user_role === 3)
+                            <li class="nav-item"><a class="nav-link" href="{{ route('student.subjects') }}">My Subjects</a></li>
+                        @endif
+    
+                        {{-- Common Logout Link --}}
+                        <li class="nav-item ms-auto">
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            </form>
+                        </li>
+                    @endauth
+    
+                    @guest
+                        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
+                    @endguest
                 </ul>
             </div>
         </div>
     </nav>
+    
 
     <div class="container mt-4">
         @yield('content')
