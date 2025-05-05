@@ -21,7 +21,7 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $subject->subjectCode }}</td>
-                <td>{{ $subject->name }}</td>
+                <td>{{ $subject->subjectName }}</td>
                 <td>{{ $subject->lecturer->name ?? '-' }}</td>
                 <td>
                     <a href="{{ route('student.subject.assessments', $subject->id) }}" class="btn btn-primary btn-sm">View Assessments</a>

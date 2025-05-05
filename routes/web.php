@@ -12,9 +12,8 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/check-auth', function () {
-    return Auth::check() ? 'Authenticated as ' . Auth::user()->email : 'Not Authenticated';
-});
+    Route::get('/student/subjects', [App\Http\Controllers\StudentSubjectController::class, 'index'])->name('student.subjects');
+    Route::get('/student/subjects/{subject}/assessments', [App\Http\Controllers\StudentSubjectController::class, 'showAssessments'])->name('student.subject.assessments');
 
 
 Route::group(['middleware' => 'auth'], function () { 
@@ -22,8 +21,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('lecturer', App\Http\Controllers\LecturerController::class); 
     Route::resource('subject', App\Http\Controllers\SubjectController::class);
     
-    //Route::resource('mark', App\Http\Controllers\MarkController::class);
-    //Route::resource('assessment', App\Http\Controllers\AssessmentController::class);
+    Route::get('/student/subjects', [App\Http\Controllers\StudentSubjectController::class, 'index'])->name('student.subjects');
+    Route::get('/student/subjects/{subject}/assessments', [App\Http\Controllers\StudentSubjectController::class, 'showAssessments'])->name('student.subject.assessments');
 });
 
 Route::middleware('auth')->group(function () {

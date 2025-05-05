@@ -44,7 +44,7 @@ class AssessmentController extends Controller
             ->where('type', $validated['type'])
             ->sum('percentage');
     
-        $maxLimit = $validated['type'] === 'formative' ? 60 : 30;
+        $maxLimit = $validated['type'] === 'formative' ? 60 : 40;
     
         if ($currentTotal + $validated['percentage'] > $maxLimit) {
             return back()->withErrors([

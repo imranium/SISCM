@@ -48,8 +48,7 @@ class StudentSubjectController extends Controller
         foreach ($assessments as $assessment) {
             if (isset($marks[$assessment->id])) {
                 $score = $marks[$assessment->id]->mark;
-                $percentage = $assessment->percentage;
-                $totalCarryMark += ($score / 100) * $percentage;
+                $totalCarryMark += $score;
             }
         }
 
